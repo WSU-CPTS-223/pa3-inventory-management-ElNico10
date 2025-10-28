@@ -1,7 +1,10 @@
 #include <iostream>
 #include <string>
+#include "InventoryManager.h"
 
 using namespace std;
+
+InventoryManager inventoryManager;
 
 void printHelp()
 {
@@ -16,7 +19,7 @@ bool validCommand(string line)
 {
     return (line == ":help") ||
            (line.rfind("find", 0) == 0) ||
-           (line.rfind("listInventory") == 0);
+           (line.rfind("listInventory", 0) == 0);
 }
 
 void evalCommand(string line)
@@ -28,14 +31,14 @@ void evalCommand(string line)
     // if line starts with find
     else if (line.rfind("find", 0) == 0)
     {
-        // Look up the appropriate datastructure to find if the inventory exist
-        cout << "YET TO IMPLEMENT!" << endl;
+        string inventoryId = line.substr(5); // Remove "find "
+        inventoryManager.displayProduct(inventoryId);
     }
     // if line starts with listInventory
-    else if (line.rfind("listInventory") == 0)
+    else if (line.rfind("listInventory", 0) == 0)
     {
-        // Look up the appropriate datastructure to find all inventory belonging to a specific category
-        cout << "YET TO IMPLEMENT!" << endl;
+        string category = line.substr(14); // Remove "listInventory "
+        inventoryManager.listCategoryProducts(category);
     }
 }
 
@@ -44,13 +47,18 @@ void bootStrap()
     cout << "\n Welcome to Amazon Inventory Query System" << endl;
     cout << " enter :quit to exit. or :help to list supported commands." << endl;
     cout << "\n> ";
-    // TODO: Do all your bootstrap operations here
-    // example: reading from CSV and initializing the data structures
-    // Don't dump all code into this single function
-    // use proper programming practices
+    
+    // Load CSV data
+    cout << "Loading inventory data from CSV..." << endl;
+    if (inventoryManager.loadFromCSV("amazon_products.csv")) {
+        cout << "Inventory data loaded successfully!" << endl;
+        inventoryManager.displayStats();
+    } else {
+        cout << "Warning: Could not load inventory data. Some features may not work." << endl;
+    }
 }
 
-int main(int argc, char const *argv[])
+int main()  // Removed unused parameters
 {
     string line;
     bootStrap();
@@ -66,5 +74,7 @@ int main(int argc, char const *argv[])
         }
         cout << "> ";
     }
+    
+    cout << "Goodbye!" << endl;
     return 0;
 }
